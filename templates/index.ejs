@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 添加这一行来适应移动端 -->
+    <title>Bind your email</title>
+    <style>
+      /* 这里可以添加一些自定义的样式 */
+      .container {
+        max-width: 600px;
+        margin: auto;
+        font-family: Arial, sans-serif;
+      }
+
+      .header {
+        background: linear-gradient(
+          to right,
+          #00c6ff,
+          #0072ff
+        ); /* 使用渐变背景色 */
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #0072ff;
+        color: white;
+        padding: 10px;
+        text-decoration: none;
+      }
+
+      .code {
+        display: inline-block;
+        background-color: #f0f0f0;
+        color: black;
+        padding: 10px;
+        font-weight: bold;
+      }
+      .footer {
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>考研交流网站</h1>
+        <p>一个专注于为学生提供学习资讯的平台</p>
+      </div>
+
+      <div class="content">
+        <p>Hi! 亲爱的用户 <%= locals.user_firstname %>，感谢您选择考研。</p>
+        <!-- 使用ejs表达式来显示用户的姓名 -->
+        <p>绑定您的电子邮件地址，请在下面复制验证码或点击按钮确认。</p>
+        <!-- 添加一些文字说明 -->
+        <p>您正在进行邮箱验证,本次请求的验证码为:</p>
+        <span class="code"><%= locals.verification_code %></span>
+        <!-- 使用ejs表达式来显示验证码，并使用自定义样式 -->
+        <p>或者你也可以点击这个按钮：</p>
+        <a href="<%= locals.confirm_link %>" class="button">确认你的邮箱</a>
+        <!-- 使用ejs表达式来生成确认链接，并使用自定义样式 -->
+        <p>
+          为了保障您帐号的安全性,请在5分钟内完成验证,祝您生活愉快!（如果您没有请求此验证码，请忽略此电子邮件。）
+        </p>
+        <div class="footer">
+          <p>真诚的，</p>
+          <p>考研交流网站</p>
+          <p><%= locals.dateTime %></p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
