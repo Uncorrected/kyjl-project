@@ -5,13 +5,13 @@ import { User } from '../entities/user.entity';
 // 修改基本信息
 export class AlterUserDto extends PickType(User, [
   'nickname',
-  'address',
+  'school',
 ] as const) {
-  @ValidateIf((o) => !o.address) // 如果其他属性没有则启用校验，不能不传属性
+  @ValidateIf((o) => !o.school) // 如果其他属性没有则启用校验，不能不传属性
   nickname: string;
 
   @ValidateIf((o) => !o.nickname)
-  address: string;
+  school: string;
 }
 
 // 修改邮箱

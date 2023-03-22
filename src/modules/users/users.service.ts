@@ -1,4 +1,5 @@
 import { Injectable, HttpException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -11,6 +12,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -19,7 +21,7 @@ export class UsersService {
         username: createUserDto.username,
       });
       if (user) {
-        return new HttpException('用户已注册！', 400);
+        throw new HttpException('用户已注册！', 400);
       } else {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...result } = await this.userRepository.save(
@@ -28,7 +30,7 @@ export class UsersService {
         return result;
       }
     } catch (err) {
-      return new HttpException('服务器内部错误！', 500);
+      throw new HttpException('服务器内部错误！', 500);
     }
   }
 
@@ -37,26 +39,37 @@ export class UsersService {
       const [users, total] = await this.userRepository.findAndCount(condition);
       return { users, total };
     } catch (err) {
-      new HttpException('服务器内部错误！', 500);
+      throw new HttpException('服务器内部错误！', 500);
     }
   }
 
   async findOne(params: OneUserVo) {
     try {
-      return this.userRepository.findOneBy(params);
+      const user = await this.userRepository.findOneBy(params);
+      if (user.avatar) {
+        const host = this.configService.get('APP_HOST');
+        const port = this.configService.get('APP_PORT');
+        const baseUrl = `${host}:${port}`;
+        const prefix = this.configService.get('ASSETS_PREFIX');
+        return {
+          ...user,
+          avatar: `${baseUrl}/${prefix}/${user.avatar}`,
+        };
+      }
+      return user;
     } catch (err) {
-      new HttpException('服务器内部错误！', 500);
+      throw new HttpException('服务器内部错误！', 500);
     }
   }
 
-  async userWithPWD(params: OneUserVo) {
+  async userPassword(params: OneUserVo) {
     try {
       return this.userRepository.findOne({
         where: params,
         select: ['password'],
       });
     } catch (err) {
-      new HttpException('服务器内部错误！', 500);
+      throw new HttpException('服务器内部错误！', 500);
     }
   }
 
@@ -70,7 +83,7 @@ export class UsersService {
         id,
       });
     } catch (err) {
-      new HttpException('服务器内部错误！', 500);
+      throw new HttpException('服务器内部错误！', 500);
     }
   }
 
@@ -79,7 +92,7 @@ export class UsersService {
       const res = await this.userRepository.delete(id);
       return res.affected ? true : false;
     } catch (err) {
-      new HttpException('服务器内部错误！', 500);
+      throw new HttpException('服务器内部错误！', 500);
     }
   }
 }

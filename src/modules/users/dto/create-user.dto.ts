@@ -6,11 +6,11 @@ export class CreateUserDto extends PickType(User, [
   'username',
   'password',
   'nickname',
-  'address',
+  'school',
 ]) {
   @IsOptional()
   nickname: string;
 
   @IsOptional()
-  address: string;
+  school: string;
 }

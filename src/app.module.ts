@@ -11,6 +11,7 @@ import { UtilsModule } from './utils/utils.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -48,6 +49,9 @@ import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
       }),
     }),
     CacheModule.register(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     UsersModule,
     PostsModule,
     UploadModule,

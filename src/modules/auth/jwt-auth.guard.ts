@@ -1,7 +1,11 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from 'src/common/public.decorator';
+import { IS_PUBLIC_KEY } from 'src/common/decorator/public.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -20,8 +24,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  // handleRequest(err, user, info) {
-  //   console.log(err, user, info);
-  //   return user;
-  // }
+  handleRequest(err, user, info) {
+    if (user === false) {
+      throw err || new UnauthorizedException('token认证失败');
+    }
+    return user;
+  }
 }

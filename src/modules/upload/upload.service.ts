@@ -1,26 +1,41 @@
+import * as fs from 'fs';
 import { Injectable } from '@nestjs/common';
-import { CreateUploadDto } from './dto/create-upload.dto';
-import { UpdateUploadDto } from './dto/update-upload.dto';
+import { ConfigService } from '@nestjs/config/dist';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class UploadService {
-  create(createUploadDto: CreateUploadDto) {
-    return 'This action adds a new upload';
-  }
+  constructor(
+    private readonly userService: UsersService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  findAll() {
-    return `This action returns all upload`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} upload`;
-  }
-
-  update(id: number, updateUploadDto: UpdateUploadDto) {
-    return `This action updates a #${id} upload`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} upload`;
+  async saveAvatarUrl(id: number, dirPath: string, newAvatar: string) {
+    const { avatar, ...user } = await this.userService.findOne({ id });
+    const lastIndexOne = avatar.lastIndexOf('/');
+    const lastIndexTwo = avatar.lastIndexOf('/', lastIndexOne - 1);
+    const filePath = dirPath + avatar.slice(lastIndexTwo); // 本地图片的路径
+    // 头像存在,删除原头像
+    if (avatar) {
+      fs.access(filePath, (err) => {
+        if (!err) {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log('删除成功');
+            }
+          });
+        } else {
+          console.log('文件不存在');
+        }
+      });
+    }
+    // 保存新头像
+    await this.userService.update(id, { avatar: newAvatar });
+    return {
+      ...user,
+      avatar: `${avatar.slice(0, lastIndexTwo)}/${newAvatar}`,
+    };
   }
 }

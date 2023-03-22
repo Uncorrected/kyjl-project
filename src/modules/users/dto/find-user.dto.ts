@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 import { User } from '../entities/user.entity';
 
 export class FindManyUserDto extends PickType(User, [
-  'address',
+  'school',
   'nickname',
 ] as const) {
   @IsPositive({ message: (args) => `${args.property}必须是正整数` })

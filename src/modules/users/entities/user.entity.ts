@@ -16,7 +16,7 @@ export class User {
 
   @IsNotEmpty({ message: (args) => `${args.property}不能为空` })
   @IsString({ message: (args) => `${args.property}必须是字符串` })
-  @Column()
+  @Column({ select: false })
   password?: string;
 
   @IsNotEmpty({ message: (args) => `${args.property}不能为空` })
@@ -32,13 +32,16 @@ export class User {
   @IsNotEmpty({ message: (args) => `${args.property}不能为空` })
   @IsString({ message: (args) => `${args.property}必须是字符串` })
   @Column({ nullable: true })
-  address: string;
+  school: string;
 
   @Column({ nullable: true })
   avatar?: string;
 
   @Column({ default: false })
   state?: boolean;
+
+  @Column({ default: false })
+  isAdmin?: boolean;
 
   @OneToMany(() => Post, (post) => post.user)
   posts?: Post[];

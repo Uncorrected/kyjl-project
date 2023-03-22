@@ -30,6 +30,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
   }
 
   // handleRequest(err, user, info) {
+  //   console.log(err, user, info);
   //   if (err || !user) {
   //     throw err || new UnauthorizedException('未捕获的异常');
   //   }

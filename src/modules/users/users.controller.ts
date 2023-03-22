@@ -24,8 +24,8 @@ import {
 } from './dto/update-user.dto';
 import { FindManyUserDto } from './dto/find-user.dto';
 import { UtilsService } from 'src/utils/utils.service';
-import { Public } from 'src/common/public.decorator';
-import { UserId } from 'src/common/user-id.decorator';
+import { Public } from 'src/common/decorator/public.decorator';
+import { UserId } from 'src/common/decorator/user-id.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -41,8 +41,8 @@ export class UsersController {
   async sendEmailCode(@UserId() userId: number, @Body('email') email: string) {
     try {
       const user = await this.usersService.findOne({ id: userId });
-      if (user?.nickname) {
-        await this.utilsService.sendEmailCode(user.nickname, email);
+      if (user?.username) {
+        await this.utilsService.sendEmailCode(user.username, email);
         return true;
       } else {
         return new HttpException('用户不存在', 400);
@@ -62,11 +62,11 @@ export class UsersController {
   // 获取用户信息
   @Public()
   @Get(':id')
-  getUser(@UserId() userId: number) {
-    return this.usersService.findOne({ id: userId });
+  getUser(@Param('id') id: number) {
+    return this.usersService.findOne({ id });
   }
 
-  // 查找用户
+  // 查找多个用户
   // @Public()
   @Get()
   getUsers(@Query() query: FindManyUserDto) {
@@ -114,16 +114,16 @@ export class UsersController {
 
   // 绑定邮箱
   @Put(':id/email')
-  async alterEmail(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() params: AlterEmailDto,
-  ) {
+  async alterEmail(@UserId() userId: number, @Body() params: AlterEmailDto) {
     try {
       const { email, code } = params;
-      const cacheCode = await this.cacheManager.get(`${id}:${email}:code`);
+      const user = await this.usersService.findOne({ id: userId });
+      const cacheCode = await this.cacheManager.get(
+        `${user.username}:${email}:code`,
+      );
       if (code != cacheCode) return new HttpException('验证码不正确！', 400);
-      const res = await this.usersService.update(id, { email });
-      await this.cacheManager.del(`${id}:${email}:code`);
+      const res = await this.usersService.update(user.id, { email });
+      await this.cacheManager.del(`${user.username}:${email}:code`);
       return res;
     } catch (err) {
       return new HttpException('服务器内部错误！', 500);
@@ -131,7 +131,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  remove(@UserId() userId: number) {
+    return this.usersService.remove(userId);
   }
 }
