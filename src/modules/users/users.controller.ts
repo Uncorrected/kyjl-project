@@ -87,8 +87,8 @@ export class UsersController {
 
   // 修改用户密码
   @Put(':id/password')
-  alterPassword(@UserId() userId: number, @Body() password: string) {
-    this.usersService.update(userId, { password });
+  alterPassword(@UserId() userId: number, @Body('password') password: string) {
+    return this.usersService.update(userId, { password });
   }
 
   // 邮箱验证码找回密码

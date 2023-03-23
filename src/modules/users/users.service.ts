@@ -83,6 +83,7 @@ export class UsersService {
         id,
       });
     } catch (err) {
+      console.log(err);
       throw new HttpException('服务器内部错误！', 500);
     }
   }

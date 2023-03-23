@@ -12,11 +12,11 @@ export class UploadService {
 
   async saveAvatarUrl(id: number, dirPath: string, newAvatar: string) {
     const { avatar, ...user } = await this.userService.findOne({ id });
-    const lastIndexOne = avatar.lastIndexOf('/');
-    const lastIndexTwo = avatar.lastIndexOf('/', lastIndexOne - 1);
-    const filePath = dirPath + avatar.slice(lastIndexTwo); // 本地图片的路径
     // 头像存在,删除原头像
     if (avatar) {
+      const lastIndexOne = avatar.lastIndexOf('/');
+      const lastIndexTwo = avatar.lastIndexOf('/', lastIndexOne - 1);
+      const filePath = dirPath + avatar.slice(lastIndexTwo); // 本地图片的路径
       fs.access(filePath, (err) => {
         if (!err) {
           fs.unlink(filePath, (err) => {
@@ -35,7 +35,7 @@ export class UploadService {
     await this.userService.update(id, { avatar: newAvatar });
     return {
       ...user,
-      avatar: `${avatar.slice(0, lastIndexTwo)}/${newAvatar}`,
+      avatar: `${process.env.APP_HOST}:${process.env.APP_POST}/${process.env.ASSETS_PREFIX}/${newAvatar}`,
     };
   }
 }
